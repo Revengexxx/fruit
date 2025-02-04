@@ -144,60 +144,58 @@ filterButton.addEventListener('click', () => {
 
 /*** СОРТИРОВКА ***/
 
-let sortKind = 'bubbleSort'; // инициализация состояния вида сортировки
-let sortTime = '-'; // инициализация состояния времени сортировки
+let sortKind = 'bubbleSort';
+sortKindLabel.textContent = sortKind;
+sortTimeLabel.textContent = '-';
 
 const comparationColor = (index1, index2) => {
   // сравнение двух элементов по длине строки в названии цвета
   return fruits[index1].color.length > fruits[index2].color.length;
 };
 
-const sortAPI = {
-  bubbleSort(arr, comparation) {
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = 0; j < arr.length - 1 - i; j++) {
-        if (comparation(arr[j], arr[j + 1])) {
-          const tmp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = tmp;
-        }
+const bubbleSort = (arr, comparation) => {
+  const n = arr.length;
+  // внешняя итерация по элементам
+  for (let i = 0; i < n - 1; i++) {
+    // внутренняя итерация для перестановки элемента в конец массива
+    for (let j = 0; j < n - 1 - i; j++) {
+      // сравниваем элементы
+      if (comparation(j, j + 1)) {
+        // делаем обмен элементов
+        let temp = arr[j + 1];
+        arr[j + 1] = arr[j];
+        arr[j] = temp;
       }
     }
-  },
-
-  quickSort(arr, comparation) {
-    if (arr.length <= 1) {
-      return arr;
-    }
-    let index = Math.floor(arr.length / 2);
-    let currentItem = arr[index];
-    let less = [];
-    let more = [];
-    for (let i = 0; i < arr.length; i += 1) {
-      if (i === index) {
-        continue;
-      }
-      if (comparation(arr[i], currentItem)) {
-        more.push(arr[i]);
-      } else {
-        less.push(arr[i])
-      }
-    }
-    return [...this.quickSort(less, comparation), currentItem, ...this.quickSort(more, comparation)];
-  },
-
-  // выполняет сортировку и производит замер времени
-  startSort(sort, arr, comparation) {
-    const start = new Date().getTime();
-    sort(arr, comparation);
-    const end = new Date().getTime();
-    sortTime = `${end - start} ms`;
-  },
+  }
 };
 
-// инициализация полей
-sortKindLabel.textContent = sortKind;
-sortTimeLabel.textContent = sortTime;
+function partition(arr, start, end) {
+  const pivotValue = arr[end].color.length;
+  let pivotIndex = start;
+  for (let i = start; i < end; i++) {
+    if (arr[i].color.length < pivotValue) {
+      [arr[i], arr[pivotIndex]] = [arr[pivotIndex], arr[i]];
+      pivotIndex++;
+    }
+  }
+  [arr[pivotIndex], arr[end]] = [arr[end], arr[pivotIndex]]
+  return pivotIndex;
+};
+
+function quickSortRecursive(arr, start, end) {
+  // выход из рекурсии
+  if (start >= end) {
+    return;
+  }
+
+  // возвращение индекса стержня
+  let index = partition(arr, start, end);
+
+  // та же функция для правого и левого подмассивов
+  quickSortRecursive(arr, start, index - 1);
+  quickSortRecursive(arr, index + 1, end);
+};
 
 sortChangeButton.addEventListener('click', () => {
   //переключать значение sortKind между 'bubbleSort' / 'quickSort'
